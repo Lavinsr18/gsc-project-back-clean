@@ -1,9 +1,11 @@
+require("dotenv").config();
 const express = require("express");
 const { google } = require("googleapis");
 const cors = require("cors");
-require("dotenv").config();
 const app = express();
 app.use(cors());
+
+console.log("ENV CREDENTIALS:", process.env.GOOGLE_CREDENTIALS);
 
 const SCOPES = ['https://www.googleapis.com/auth/webmasters.readonly'];
 const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS); // Replace with your service account file
