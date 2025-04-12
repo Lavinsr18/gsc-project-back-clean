@@ -9,9 +9,9 @@ const SCOPES = ['https://www.googleapis.com/auth/webmasters.readonly'];
 const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS); // Replace with your service account file
 
 const jwt = new google.auth.JWT(
-  KEY.client_email,
+  credentials.client_email,
   null,
-  KEY.private_key,
+  credentials.private_key,
   SCOPES
 );
 
