@@ -2,13 +2,12 @@ require("dotenv").config();
 const express = require("express");
 const { google } = require("googleapis");
 const cors = require("cors");
+
 const app = express();
 app.use(cors());
 
-console.log("ENV CREDENTIALS:", process.env.GOOGLE_CREDENTIALS);
-
 const SCOPES = ['https://www.googleapis.com/auth/webmasters.readonly'];
-const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS); // Replace with your service account file
+const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS.replace(/\\n/g, '\n'));
 
 const jwt = new google.auth.JWT(
   credentials.client_email,
@@ -26,7 +25,7 @@ app.get("/api/data", async (req, res) => {
   try {
     await jwt.authorize();
     const response = await searchconsole.searchanalytics.query({
-      siteUrl: "https://gsc-project-mu.vercel.app/", // Replace with your verified site
+      siteUrl: "https://gsc-project-mu.vercel.app/",
       requestBody: {
         startDate: "2024-03-01",
         endDate: "2025-05-01",
@@ -34,10 +33,12 @@ app.get("/api/data", async (req, res) => {
         rowLimit: 10,
       },
     });
-    res.json(response.data.rows);
+    res.json(response.data.rows || []);
   } catch (err) {
-    res.status(500).send(err.message);
+    console.error("GSC API Error:", err);
+    res.status(500).json({ error: err.message });
   }
 });
 
-app.listen(3000, () => console.log("Backend running on http://localhost:3000"));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Backend running on port ${PORT}`));
