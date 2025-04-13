@@ -9,7 +9,7 @@ app.use(cors());
 const SCOPES = ['https://www.googleapis.com/auth/webmasters.readonly'];
 
 // Parse credentials string from Render env vars
-const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS.replace(/\\n/g, '\n'));
+const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
 
 const jwt = new google.auth.JWT(
   credentials.client_email,
