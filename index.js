@@ -6,9 +6,15 @@ const cors = require("cors");
 const app = express();
 app.use(cors());
 
+// Define scopes for Google Search Console API
 const SCOPES = ['https://www.googleapis.com/auth/webmasters.readonly'];
-const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS.replace(/\\n/g, '\n'));
 
+// Parse the GOOGLE_CREDENTIALS from environment variables
+const credentials = JSON.parse(
+  process.env.GOOGLE_CREDENTIALS.replace(/\\n/g, '\n')
+);
+
+// Create JWT client
 const jwt = new google.auth.JWT(
   credentials.client_email,
   null,
@@ -16,11 +22,13 @@ const jwt = new google.auth.JWT(
   SCOPES
 );
 
+// Initialize Google Search Console API
 const searchconsole = google.searchconsole({
   version: 'v1',
   auth: jwt,
 });
 
+// API route to get data from GSC
 app.get("/api/data", async (req, res) => {
   try {
     await jwt.authorize();
@@ -40,5 +48,6 @@ app.get("/api/data", async (req, res) => {
   }
 });
 
+// Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Backend running on port ${PORT}`));
