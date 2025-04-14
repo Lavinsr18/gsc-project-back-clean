@@ -1,30 +1,36 @@
-require("dotenv").config();
+// backend/index.js (ya jahan API defined hai)
 const express = require("express");
-const { google } = require("googleapis");
 const cors = require("cors");
+require("dotenv").config();
 
 const app = express();
 app.use(cors());
 
-const SCOPES = ['https://www.googleapis.com/auth/webmasters.readonly'];
-
-// Parse credentials string from Render env vars
-const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
-
-const jwt = new google.auth.JWT(
-  credentials.client_email,
-  null,
-  credentials.private_key,
-  SCOPES
-);
-
-const searchconsole = google.searchconsole({
-  version: 'v1',
-  auth: jwt,
-});
+const useMockData = true; // ← yeh switch on/off karo jab chaho
+const mockData = require("./mockData");
 
 app.get("/api/data", async (req, res) => {
+  if (useMockData) {
+    return res.json(mockData);
+  }
+
+  // Actual GSC logic
   try {
+    const { google } = require("googleapis");
+    const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
+
+    const jwt = new google.auth.JWT(
+      credentials.client_email,
+      null,
+      credentials.private_key,
+      ['https://www.googleapis.com/auth/webmasters.readonly']
+    );
+
+    const searchconsole = google.searchconsole({
+      version: 'v1',
+      auth: jwt,
+    });
+
     await jwt.authorize();
 
     const response = await searchconsole.searchanalytics.query({
