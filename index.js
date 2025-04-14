@@ -6,49 +6,33 @@ require("dotenv").config();
 const app = express();
 app.use(cors());
 
-const useMockData = true; // ← yeh switch on/off karo jab chaho
-const mockData = require("./mockData");
+app.get("/api/data", (req, res) => {
+  const mockData = [
+    {
+      keys: ["Discover falahbits - Top Digital Marketing Agency | Agencyspot"],
+      clicks: 120,
+      impressions: 3000,
+      ctr: 0.04,
+      position: 2.3,
+    },
+    {
+      keys: ["AdTech Hub - Trusted Marketing Agency for Growth | Agencyspot"],
+      clicks: 90,
+      impressions: 2400,
+      ctr: 0.0375,
+      position: 3.1,
+    },
+    {
+      keys: ["ADAM 4 Business - SEO, PPC & Social Media Experts | Agencyspot"],
+      clicks: 30,
+      impressions: 1500,
+      ctr: 0.02,
+      position: 5.8,
+    },
+  ];
 
-app.get("/api/data", async (req, res) => {
-  if (useMockData) {
-    return res.json(mockData);
-  }
-
-  // Actual GSC logic
-  try {
-    const { google } = require("googleapis");
-    const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
-
-    const jwt = new google.auth.JWT(
-      credentials.client_email,
-      null,
-      credentials.private_key,
-      ['https://www.googleapis.com/auth/webmasters.readonly']
-    );
-
-    const searchconsole = google.searchconsole({
-      version: 'v1',
-      auth: jwt,
-    });
-
-    await jwt.authorize();
-
-    const response = await searchconsole.searchanalytics.query({
-      siteUrl: "https://gsc-project-mu.vercel.app/",
-      requestBody: {
-        startDate: "2024-03-01",
-        endDate: "2025-05-01",
-        dimensions: ["page"],
-        rowLimit: 10,
-      },
-    });
-
-    res.json(response.data.rows || []);
-  } catch (err) {
-    console.error("GSC API Error:", err);
-    res.status(500).json({ error: err.message });
-  }
+  res.json(mockData);
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`✅ Backend running on port ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Mock backend running on port ${PORT}`));
